@@ -7,10 +7,12 @@ N=100
 
 delta_time = 0.1
 
-active_vel= 0.1
+active_vel= 0.5
+
 gamma_friction = 3.92*active_vel
 radius =1.
-diamater = 2*radius
+diameter = 2*radius
+dos_pi = 2*np.pi
 
 class Particle(object):
 
@@ -31,7 +33,7 @@ def print_particle(A=Particle, optional=False):
 		print(x.node,A.angle,A.velocity)
 
 def create_particle():
-	A = Particle(np.random.uniform(size=2)*L,np.random.uniform())
+	A = Particle(np.random.uniform(size=2)*L,np.random.uniform()*dos_pi)
 	return A
 
 def dx_distance(A=Particle,B=Particle):
@@ -54,51 +56,54 @@ def dx_distance(A=Particle,B=Particle):
 			dy[1]=dx[i+1][1]
 			res_y=abs(dy[1])	
 
-	#dis = np.sqrt((np.squre(dy).sum()))
+	dis = np.sqrt((np.square(dy).sum()))
 
-	#if (dis <= diameter):
-		#inter = True
-	#else:
-		#inter = False
-			
-	return dy
+	if (dis <= diameter):
+		inter = True
+	else:
+		inter = False
+
+	result = np.append(dy,np.array([dis]))
+
+	return result
 
 
-def field(system=np.array, part_index=int, dtype=np.object):
+def evolution(system=np.array, part_index=int, dtype=np.object):
 	
+	A = system[part_index]
+
 	potencial = np.zeros(2)
 	campo = np.zeros(2)
+
+	interact=False
 
 	#Loop sobre todas las partículas que interactúa:
 	for i in range(system.size-1):
 		dx = dx_distance(system[part_index],system[i])
 
-		distance = np.square(dx).sum()
-		distance = np.sqrt(distance)
+		if(dx[2] <= diameter):
+			interact=True		
+			#print(dx, dx.shape, "interact")
+			#calculamos potencial
+			distance = np.square(dx[0:2]).sum()
+			distance = np.sqrt(distance)
+			potencial += np.power(distance,-3)*dx[0:2]
+			potencial *= gamma_friction	
 
-		potencial += np.power(distance,-3)*dx
-
-	potencial = gamma_friction*potencial
-
-	#Calculo del campo resultante
-	field = np.array([np.cos(system[part_index].angle), np.sin(system[part_index].angle)])
-	field *=active_vel
-	field +=potencial 
-
-	return field
-
-def evolution(system=np.array, index=int, inter=bool):
-
-	A = system[index]
-
-	if inter:
-		A.x += delta_time*field(system, index)
+	if (interact):
+		#Calculo del campo resultante
+		field = np.array([np.cos(system[part_index].angle), np.sin(system[part_index].angle)])
+		field *=active_vel
+		field +=potencial 
+		
+		#Evolución		
+		A.x += delta_time*field
 	
 	else:
-		vel = active_vel*np.array([np.cos(system[index].angle), np.sin(system[index].angle)])		
+		#print(dx, dx.shape, "no interact")
+		vel = active_vel*np.array([np.cos(system[part_index].angle), np.sin(system[part_index].angle)])		
 		A.x += delta_time*vel
-
-
+			
 	return A
 
 
@@ -108,23 +113,67 @@ def evolution(system=np.array, index=int, inter=bool):
 A = create_particle()
 B = create_particle()
 
-A.x = np.array([1.,1.])
-B.x = np.array([1.,1.1])
+A.x = np.array([1.,2.])
+B.x = np.array([1.,1.])
 
 system = np.array([A,B])
 
-print(system[1].x)
+file = open("array.txt","w")
 
-file = open("array.txt","r+")
-for i in range(3):
+for i in range(10):
 
-	system[1]=evolution(system,1)
-	print(system[1].x)
-
-	np.savetxt(file,system[1].x)
-
-file.close()
+	system[1] = evolution(system,1)
+	save = np.append(system[1].x,np.array([i*delta_time]) )
+	np.savetxt(file, save.reshape(1,3))
 	
+file.close()
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
+x1=np.array([[1.,2.]])
+x2= np.array([1.])
+
+print(x1, x1.shape)
+print(x2, x2.shape)
+
+x3 = np.append(x1,x2)
+
+print(x3,x3.shape)
+'''
+
+
+'''
+#Gráfico
+
+grafico = np.loadtxt('array.txt')
+
+obstaculo = system[0].x.reshape(1,2)
+
+
+plt.title("Trayectory") 
+plt.xlabel("x axis caption") 
+plt.ylabel("y axis caption")
+plt.xlim(-10,10)
+plt.ylim(-10,10)
+
+plt.plot(grafico[0:,0],grafico[0:,1],"o", color='r')
+plt.plot(obstaculo[0:,0], obstaculo[0:,1],"o") 
+plt.show()
+'''
+
+
+
 
 
 
