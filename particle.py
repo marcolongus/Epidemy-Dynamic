@@ -2,32 +2,29 @@
 
 import numpy as np
 
-# System Parameters
+def f(x,a):
+	f = 3*a
+	return f
 
-N = 50
-L = 70
+print (f(np.ones(3)))
 
-# Particle parameter
-
-active_vel= 0.1
-
-radius = 1.
-diameter = 2*radius
-alpha_rot = 100.
+a = 3
 
 
-beta = 1 
-gamma_friction = 3.92*active_vel
+''' No sé si irá a  servir: 
+def particle_distance(A=Particle,B=Particle):
 
-dos_Pi = 2*np.pi
-
-def distance(A=Particle,B=Particle):
-
-	res = 0.
+	res = infinity
+	x1 = np.zeros(2)
 	for i in range(-1,2):
 		for j in range(-1,2):
-			x1 = A.x + i*L
-			y1 = A.x + j*L 
 
+			x1[0] = A.x[0] + i*L
+			x1[1] = A.x[1] + j*L
 
-			res = np.minimun( res,  )
+			x_dif = x1-B.x 
+
+			res = min(res, np.square(x_dif).sum())
+
+	return np.sqrt(res)
+'''
