@@ -1,18 +1,24 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import sortedcontainers as st
 
-L=100
-infinity = 10000000000000000
-N=100
+#Constantes del sistema
+
+#Variables
+N=5
+L=10
 
 delta_time = 0.1
-
 active_vel= 0.5
 
+#Fijas
+infinity = 10000000000000000
 gamma_friction = 3.92*active_vel
 radius =1.
 diameter = 2*radius
 dos_pi = 2*np.pi
+
+#Clase Particle
 
 class Particle(object):
 
@@ -26,11 +32,6 @@ class Particle(object):
 		self.node = x.astype(int)
 
 #Funciones
-
-def print_particle(A=Particle, optional=False):
-	print(A.x)
-	if optional:
-		print(x.node,A.angle,A.velocity)
 
 def create_particle():
 	A = Particle(np.random.uniform(size=2)*L,np.random.uniform()*dos_pi)
@@ -109,25 +110,15 @@ def evolution(system=np.array, part_index=int, dtype=np.object):
 
 #########################################################################
 
+#Arregla el problema de la indexación de numpy
 
-A = create_particle()
-B = create_particle()
+class elemento(object):
 
-A.x = np.array([1.,2.])
-B.x = np.array([1.,1.])
+	def  __init__(self,set=st.SortedSet):
+		self.set = st.SortedSet()
 
-system = np.array([A,B])
 
-file = open("array.txt","w")
-
-for i in range(10):
-
-	system[1] = evolution(system,1)
-	save = np.append(system[1].x,np.array([i*delta_time]) )
-	np.savetxt(file, save.reshape(1,3))
-	
-file.close()
-
+#########################################################################
 
 
 
