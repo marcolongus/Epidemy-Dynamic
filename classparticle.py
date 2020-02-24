@@ -5,7 +5,7 @@ import sortedcontainers as st
 #Constantes del sistema
 
 #Variables
-N=5
+N=12
 L=10
 
 delta_time = 0.1
@@ -84,7 +84,7 @@ def evolution(system=np.array, part_index=int, dtype=np.object):
 
 		if(dx[2] <= diameter):
 			interact=True		
-			#print(dx, dx.shape, "interact")
+			
 			#calculamos potencial
 			distance = np.square(dx[0:2]).sum()
 			distance = np.sqrt(distance)
