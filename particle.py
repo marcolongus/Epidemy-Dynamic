@@ -23,7 +23,10 @@ box = box.reshape(L,L)
 
 ####################################################
 
+file   = open("array.txt","w")
+
 system = np.empty(N, dtype=object)
+save   = np.empty(0)
 
 for i in range(N):
 	
@@ -50,9 +53,14 @@ for i in range(N):
 						if ( dx_distance(system[i],system[elem])[2] < diameter ): 
 							accepted = False
 
-		if (accepted): box[x,y].set.add(i)
+		if (accepted): 
+			box[x,y].set.add(i)
+			save = np.append(save,system[i].x)
 
+save = save.reshape(N,2)
+np.savetxt(file,save)
 
+file.close()
 
 ####################################################
 
@@ -60,9 +68,7 @@ for i in range(N):
 
 ####################################################
 
-file  = open("array.txt","w")
-
-save = np.empty(0)
+file  = open("array.txt","r")
 
 for i in range(L):
 	for j in range(L):
@@ -71,11 +77,6 @@ for i in range(L):
 			
 			print(box[i,j].set, '[',i,',',j,']')
 
-			for elem in box[i,j].set:
-				save = np.append(save,system[elem].x)
-
-save = save.reshape(N,2)
-np.savetxt(file,save)
 
 file.close()
 
@@ -142,8 +143,13 @@ fig, ax =plt.subplots()
 #Graficamos la configuración inical de obstáculos
 
 for i in range(N):
-	circ = patches.Circle((grafico1[i,0], grafico1[i,1]), 1, alpha=0.7, fc='yellow')
-	ax.add_patch(circ)
+
+	if (i==0):
+		circ = patches.Circle((grafico1[i,0], grafico1[i,1]), 1, alpha=0.7, fc='green')
+		ax.add_patch(circ)
+	else:
+		circ = patches.Circle((grafico1[i,0], grafico1[i,1]), 1, alpha=0.7, fc='yellow')
+		ax.add_patch(circ)
 
 plt.plot(grafico1[0:,0],grafico1[0:,1], "o", color='b')
 

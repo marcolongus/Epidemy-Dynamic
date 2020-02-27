@@ -5,7 +5,7 @@ import sortedcontainers as st
 #Constantes del sistema
 
 #Variables
-N=10
+N=40
 L=20
 
 time_f = 100
