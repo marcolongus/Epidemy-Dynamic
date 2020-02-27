@@ -2,8 +2,11 @@ from classparticle import *
 import sortedcontainers as st
 import matplotlib.patches as patches
 
+####################################################
 
 #Cuadricula de sets
+
+####################################################
 
 box = np.empty(L*L,dtype = object)
 
@@ -13,7 +16,12 @@ for i in range(L*L):
 box = box.reshape(L,L)
 
 
+
+####################################################
+
 #Inicialización del sistema
+
+####################################################
 
 system = np.empty(N, dtype=object)
 
@@ -46,8 +54,11 @@ for i in range(N):
 
 
 
+####################################################
 
 #Exploracion
+
+####################################################
 
 file  = open("array.txt","w")
 
@@ -69,13 +80,78 @@ np.savetxt(file,save)
 file.close()
 
 
+
+####################################################
+
+#Evolución
+
+####################################################
+
+file = open("evolution.txt","w")
+
+for i in range(time_f):
+
+	x_old = system[0].node[0]
+	y_old = system[0].node[1]
+
+	interact_set = np.empty(shape=(5,5),dtype=object)
+
+	for x_rang in range(-2,3):
+		for y_rang in range(-2,3):
+
+			x_m = np.mod(x_old + x_rang, L)
+			y_m = np.mod(y_old + y_rang, L)
+			interact_set[x_rang+2,y_rang+2] = box[x_m,y_m]
+
+	system[0] = evolution(system,0,interact_set)
+	save = np.append(system[0].x,np.array([(i+1)*delta_time]) )
+	np.savetxt(file, save.reshape(1,3))
+
+	system[0].nodo()
+
+	x_new = system[0].node[0]
+	y_new = system[0].node[1]
+
+	flag = False
+
+	if ( not (0 in box[x_new,y_new].set)):
+		box[x_old,y_old].set.discard(0)
+		box[x_new,y_new].set.add(0)
+		flag = True
+	
+	if flag:
+		print(system[0].x, system[0].node)	
+				
+
+file.close()
+
+
+
+####################################################
+
 #Gráfico
 
-grafico = np.loadtxt('array.txt')
+####################################################
+
+grafico  = np.loadtxt('evolution.txt')
+grafico1 = np.loadtxt('array.txt')
 
 fig, ax =plt.subplots()
 
+
+#Graficamos la configuración inical de obstáculos
+
 for i in range(N):
+	circ = patches.Circle((grafico1[i,0], grafico1[i,1]), 1, alpha=0.7, fc='yellow')
+	ax.add_patch(circ)
+
+plt.plot(grafico1[0:,0],grafico1[0:,1], "o", color='b')
+
+
+
+#Ahora seguimos la evolución de alguna partícula
+
+for i in range(time_f):
 	circ = patches.Circle((grafico[i,0], grafico[i,1]), 1, alpha=0.7, fc='red')
 	ax.add_patch(circ)
 
@@ -96,49 +172,3 @@ plt.plot(grafico[0:,0],grafico[0:,1], "o", color='b')
 plt.show()
 
 
-
-'''
-#Evolución
-
-file = open("array.txt","w")
-
-for i in range(15):
-
-	system[1] = evolution(system,1)
-	save = np.append(system[1].x,np.array([i*delta_time]) )
-	np.savetxt(file, save.reshape(1,3))
-	
-file.close()
-'''
-
-
-'''
-#Gráfico
-
-grafico = np.loadtxt('array.txt')
-
-obstaculo = system[0].x.reshape(1,2)
-
-
-plt.title("Trayectory") 
-plt.xlabel("x axis caption") 
-plt.ylabel("y axis caption")
-plt.xlim(-10,10)
-plt.ylim(-10,10)
-
-plt.plot(grafico[0:,0],grafico[0:,1],"o", color='r')
-plt.plot(obstaculo[0:,0], obstaculo[0:,1],"o") 
-plt.show()		
-'''
-
-
-'''
-A = create_particle()
-B = create_particle()
-
-A.x = np.array([1.,2.])
-B.x = np.array([1.,1.])
-
-system = np.array([A,B])
-
-'''

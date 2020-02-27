@@ -5,11 +5,13 @@ import sortedcontainers as st
 #Constantes del sistema
 
 #Variables
-N=12
-L=10
+N=10
+L=20
 
-delta_time = 0.1
-active_vel= 0.5
+time_f = 100
+
+delta_time = 0.5
+active_vel= 1.
 
 #Fijas
 infinity = 10000000000000000
@@ -17,6 +19,18 @@ gamma_friction = 3.92*active_vel
 radius =1.
 diameter = 2*radius
 dos_pi = 2*np.pi
+
+
+
+#Arregla el problema de la indexación de numpy
+
+class elemento(object):
+
+	def  __init__(self,set=st.SortedSet):
+		self.set = st.SortedSet()
+
+
+#########################################################################
 
 #Clase Particle
 
@@ -31,6 +45,10 @@ class Particle(object):
 		self.velocity = velocity
 		self.node = x.astype(int)
 
+	def nodo(self):
+		self.node= np.mod(self.x.astype(int),L)
+
+	
 #Funciones
 
 def create_particle():
@@ -69,7 +87,7 @@ def dx_distance(A=Particle,B=Particle):
 	return result
 
 
-def evolution(system=np.array, part_index=int, dtype=np.object):
+def evolution(system=np.array, part_index=int, box=np.array ,dtype=np.object):
 	
 	A = system[part_index]
 
@@ -79,46 +97,48 @@ def evolution(system=np.array, part_index=int, dtype=np.object):
 	interact=False
 
 	#Loop sobre todas las partículas que interactúa:
-	for i in range(system.size-1):
-		dx = dx_distance(system[part_index],system[i])
 
-		if(dx[2] <= diameter):
-			interact=True		
-			
-			#calculamos potencial
-			distance = np.square(dx[0:2]).sum()
-			distance = np.sqrt(distance)
-			potencial += np.power(distance,-3)*dx[0:2]
-			potencial *= gamma_friction	
+	for i in range(5):
+		for j in range(5):
+
+			for particles in box[i,j].set:
+
+				if (particles != part_index):
+					dx = dx_distance(system[part_index],system[particles])
+
+					if(dx[2] <= diameter):
+						interact=True		
+						
+						#calculamos potencial
+						distance = np.square(dx[0:2]).sum()
+						distance = np.sqrt(distance)
+						potencial += np.power(distance,-3)*dx[0:2]
+						potencial *= gamma_friction	
+
+	#############################################################################
 
 	if (interact):
 		#Calculo del campo resultante
 		field = np.array([np.cos(system[part_index].angle), np.sin(system[part_index].angle)])
 		field *=active_vel
 		field +=potencial 
-		
+						
 		#Evolución		
 		A.x += delta_time*field
+		A.x = np.mod(A.x,L)
 	
 	else:
 		#print(dx, dx.shape, "no interact")
 		vel = active_vel*np.array([np.cos(system[part_index].angle), np.sin(system[part_index].angle)])		
 		A.x += delta_time*vel
+		A.x = np.mod(A.x,L)
 			
 	return A
 
 
 #########################################################################
 
-#Arregla el problema de la indexación de numpy
 
-class elemento(object):
-
-	def  __init__(self,set=st.SortedSet):
-		self.set = st.SortedSet()
-
-
-#########################################################################
 
 
 
