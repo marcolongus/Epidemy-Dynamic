@@ -3,9 +3,7 @@ import sortedcontainers as st
 import matplotlib.patches as patches
 
 ####################################################
-
 #Cuadricula de sets
-
 ####################################################
 
 box = np.empty(L*L,dtype = object)
@@ -18,9 +16,7 @@ box = box.reshape(L,L)
 
 
 ####################################################
-
 #Inicialización del sistema
-
 ####################################################
 
 file   = open("array.txt","w")
@@ -63,9 +59,7 @@ np.savetxt(file,save)
 file.close()
 
 ####################################################
-
 #Exploracion
-
 ####################################################
 
 file  = open("array.txt","r")
@@ -83,9 +77,7 @@ file.close()
 
 
 ####################################################
-
 #Evolución
-
 ####################################################
 
 file = open("evolution.txt","w")
@@ -129,9 +121,7 @@ file.close()
 
 
 ####################################################
-
 #Gráfico
-
 ####################################################
 
 grafico  = np.loadtxt('evolution.txt')
